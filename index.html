@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>舒尔特方格 - 最简单、最有效、最科学的注意力训练方法</title>
+    <style>
+        main {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+
+
+        h1 {
+            font-size: 30px;
+            margin: 20px 0px 10px;
+        }
+
+        select {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        p {
+            margin: 0px 0px 20px;
+        }
+
+        table {
+            margin-top: 20px;
+            font-size: 25px;
+            text-align: center;
+        }
+
+
+        tr {
+            display: flex;
+        }
+
+        td {
+            width: 60px;
+            height: 60px;
+            border-color: #000;
+            border-style: solid;
+            border-width: 2px 2px 0px 0px;
+            padding: 0px;
+            margin: 0px;
+            vertical-align: unset;
+            display: flex;
+            transition: .25s;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        td.yes {
+            color: #0f0;
+        }
+
+        td.error {
+            color: #f00;
+        }
+
+        tbody {
+            border-color: #000;
+            border-style: solid;
+            border-width: 2px 2px 4px 4px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <section>
+            <h1>选择规格</h1>
+            <select size="3">
+                <option>3x3（9个数）</option>
+                <option>4x4（16个数）</option>
+                <option selected>5x5（25个数）</option>
+            </select>
+            <button>开始！</button>
+        </section>
+        <section>
+            <h1>0'00''00</h1>
+            <p>请稍后</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        !function () {
+            const select = document.querySelector("select");
+            const table = document.querySelector("tbody");
+            const count = document.querySelectorAll("h1")[1];
+            const page1 = document.querySelectorAll("section")[0];
+            const page2 = document.querySelectorAll("section")[1];
+            const start = document.querySelector("button");
+            const p = document.querySelector("p");
+            page2.style.display = "none";
+            start.addEventListener("click", function () {
+                function setIndexNumber(x, y, n) {
+                    table.children[y].children[x].innerText = n;
+                };
+                const size = 3 + select.selectedIndex;
+                const tableHTML = `<tr>${`<td>1</td>`.repeat(size)}</tr>`.repeat(size);
+                table.innerHTML = tableHTML;
+                page1.style.display = "none";
+                page2.style.display = "";
+                const array = new Array(size ** 2).fill(0).map((_, i) => [Math.random() * 1e6, i + 1]).sort((a, b) => a[0] - b[0]).map(v => v[1]);
+                array.forEach((v, i) => {
+                    setIndexNumber(i % size, ~~((i) / size), v)
+                });
+                var now = 1;
+                const max = size ** 2;
+                var time = null;
+                const inter = setInterval(() => {
+                    var t = "准备开始";
+                    if (time) {
+                        t = "请点击" + now;
+                        var now1 = Date.now() - time;
+                        var ms = String(now1 % 1000).slice(0, 2);
+                        var s = ~~((now1 % 60000) / 1000);
+                        var m = ~~((now1 % 3600000) / 60000);
+                        count.innerText = `${m}'${String(s).length === 1 ? "0" + s : s}''${String(ms).length === 1 ? "0" + ms : ms}`
+                    }
+                    p.innerText = t;
+                }, 16);
+                const allg = document.querySelectorAll("td");
+                allg.forEach(e => {
+                    e.addEventListener("click", function () {
+                        if (String(now) === this.innerText) {
+                            if (!time) {
+                                time = Date.now();
+                            };
+                            if (now >= max) {
+                                clearInterval(inter);
+                                p.innerText = "完成，用时↑";
+                            } else {
+                                if (this.classList.contains("yes")) return;
+                                if (this.classList.contains("error")) return;
+                                this.classList.add("yes");
+                                setTimeout(() => {
+                                    this.classList.remove("yes");
+                                }, 500);
+                                now++;
+                            }
+                        } else {
+                            if (this.classList.contains("yes")) return;
+                            if (this.classList.contains("error")) return;
+                            this.classList.add("error");
+                            setTimeout(() => {
+                                this.classList.remove("error");
+                            }, 500);
+                        }
+                    })
+                });
+            })
+        }()
+    </script>
+    <script src="../static/js/dm.js"></script>
+</body>
+
+</html>
